@@ -31,4 +31,4 @@ COPY --chown=appuser:appgroup . .
 EXPOSE 8080
 
 # FastAPI 애플리케이션 실행
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
