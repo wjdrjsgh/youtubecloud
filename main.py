@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Query
 from youtube_transcript_api import YouTubeTranscriptApi
 import urllib.parse
 import requests
+from datetime import datetime
 
 app = FastAPI()
 
@@ -19,8 +20,19 @@ def get_video_id(encoded_path: str) -> str:
         raise HTTPException(status_code=400, detail="유효하지 않은 유튜브 경로 형식입니다.")
     return video_id
 
+def get_highest_quality_thumbnail(video_id: str) -> str:
+    """가능한 최대 해상도의 썸네일 URL 반환"""
+    quality_order = ["maxresdefault", "sddefault", "hqdefault", "mqdefault", "default"]
+    for quality in quality_order:
+        thumbnail_url = f"https://img.youtube.com/vi/{video_id}/{quality}.jpg"
+        # 썸네일 URL 유효성 검사
+        response = requests.head(thumbnail_url)
+        if response.status_code == 200:
+            return thumbnail_url
+    raise HTTPException(status_code=404, detail="유효한 썸네일을 찾을 수 없습니다.")
+
 def get_video_info(video_id: str) -> dict:
-    """YouTube Data API로 제목, 유튜버 이름, 게시일, 썸네일 링크 가져오기"""
+    """YouTube Data API로 제목, 유튜버 이름, 게시일 가져오기"""
     url = f"https://www.googleapis.com/youtube/v3/videos?part=snippet&id={video_id}&key={YOUTUBE_API_KEY}"
     response = requests.get(url)
     if response.status_code != 200:
@@ -33,9 +45,13 @@ def get_video_info(video_id: str) -> dict:
     snippet = data["items"][0]["snippet"]
     title = snippet.get("title", "제목 없음")
     channel_title = snippet.get("channelTitle", "채널 이름 없음")
-    published_at = snippet.get("publishedAt", "게시일 없음")  # 게시일 추가
-    thumbnail_url = snippet["thumbnails"]["high"]["url"]  # 썸네일 링크
-    return {"title": title, "channel_title": channel_title, "published_at": published_at, "thumbnail_url": thumbnail_url}
+    published_at = snippet.get("publishedAt", "게시일 없음")
+
+    # 연/월/일 형식으로 변환
+    if published_at != "게시일 없음":
+        published_at = datetime.strptime(published_at, "%Y-%m-%dT%H:%M:%SZ").strftime("%Y-%m-%d")
+
+    return {"title": title, "channel_title": channel_title, "published_at": published_at}
 
 @app.get("/transcripts/")
 def get_transcripts(
@@ -44,12 +60,14 @@ def get_transcripts(
     """YouTube ID를 받고 '제목', '유튜버 이름', '게시일', '썸네일 링크', '스크립트' 반환"""
     video_id = get_video_id(youtube_path)
     try:
-        # 제목, 유튜버 이름, 게시일, 썸네일 링크 가져오기
+        # 제목, 유튜버 이름, 게시일 가져오기
         video_info = get_video_info(video_id)
         title = video_info["title"]
         channel_title = video_info["channel_title"]
         published_at = video_info["published_at"]
-        thumbnail_url = video_info["thumbnail_url"]
+
+        # 최대 해상도 썸네일 URL 가져오기
+        thumbnail_url = get_highest_quality_thumbnail(video_id)
 
         # 자막 가져오기
         transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
@@ -67,14 +85,9 @@ def get_transcripts(
         return {
             "title": title,
             "channel_title": channel_title,
-            "published_at": published_at,
-            "thumbnail_url": thumbnail_url,  # 썸네일 링크 포함
+            "published_at": published_at,  # 연/월/일로 변환된 게시일
+            "thumbnail_url": thumbnail_url,  # 최대 해상도 썸네일
             "content": transcripts
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"오류 발생: {e}")
-
-# FastAPI 실행 설정
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
