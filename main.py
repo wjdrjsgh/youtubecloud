@@ -73,3 +73,8 @@ def get_transcripts(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"오류 발생: {e}")
+
+# FastAPI 실행 설정
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8080)
