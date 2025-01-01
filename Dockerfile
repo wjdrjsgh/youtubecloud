@@ -13,11 +13,12 @@ WORKDIR /app
 # pip 업그레이드 및 패키지 설치
 RUN apt-get update && \
     apt-get install -y vim && \
+    rm -rf /var/lib/apt/lists/* && \
     pip install --upgrade pip
 
 # requirements.txt 파일 복사 및 패키지 설치
-COPY --chown=appuser:appgroup requirements.txt .
-RUN pip install -r requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # 사용자 변경
 USER appuser:appgroup
@@ -25,10 +26,11 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # 애플리케이션 파일 복사
-COPY --chown=appuser:appgroup . .
+COPY . .
 
 # 포트 노출
 EXPOSE 8080
 
 # FastAPI 애플리케이션 실행
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["uvicorn", "main:app"]
+CMD ["--host", "0.0.0.0", "--port", "8080"]
