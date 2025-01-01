@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movie List</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .movie-card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 15px 0;
+            width: 300px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .movie-title {
+            font-size: 1.5em;
+            color: #333333;
+            margin: 0;
+        }
+
+        .movie-details {
+            font-size: 1.1em;
+            color: #666666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Movie List</h1>
+    </header>
+    <div class="container">
+        {% for movie in movies %}
+        <div class="movie-card">
+            <div class="movie-title">{{ movie.title }}</div>
+            <div class="movie-details">Genre: {{ movie.genre }}</div>
+            <div class="movie-details">Year: {{ movie.year }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
