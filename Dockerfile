@@ -31,8 +31,8 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # 포트 노출
-EXPOSE 80
+EXPOSE 8080
 
 # FastAPI 애플리케이션 실행
 ENTRYPOINT ["uvicorn", "main:app"]
-CMD ["--host", "0.0.0.0", "--port", "80"]
+CMD ["--host", "0.0.0.0", "--port", "8080"]
