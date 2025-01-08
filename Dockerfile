@@ -20,13 +20,15 @@ RUN apt-get update && \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# 애플리케이션 파일 복사 후 권한 변경
+COPY . .
+RUN chown -R appuser:appgroup /app
+RUN chmod +x main.py
+
 # 사용자 변경
 USER appuser:appgroup
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-
-# 애플리케이션 파일 복사
-COPY . .
 
 # 포트 노출
 EXPOSE 80
