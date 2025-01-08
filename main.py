@@ -53,6 +53,10 @@ def get_video_info(video_id: str) -> dict:
 
     return {"title": title, "channel_title": channel_title, "published_at": published_at}
 
+@app.get("/")
+def read_root():
+    return {"message": "OK"}
+
 @app.get("/transcripts/")
 def get_transcripts(
     youtube_path: str = Query(..., description="유튜브 비디오 경로, URL 인코딩 필요")
