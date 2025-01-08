@@ -3,6 +3,8 @@ from youtube_transcript_api import YouTubeTranscriptApi
 import urllib.parse
 import requests
 from datetime import datetime
+import os
+import uvicorn
 
 app = FastAPI()
 
@@ -95,3 +97,9 @@ def get_transcripts(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"오류 발생: {e}")
+
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run(app, host="0.0.0.0", port=port)
