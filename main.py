@@ -83,6 +83,7 @@ def get_transcripts(
             try:
                 language_code = transcript.language_code
                 transcript_text = YouTubeTranscriptApi.get_transcript(video_id, languages=[language_code])
+                # transcript_text = YouTubeTranscriptApi.get_transcript(video_id, languages=['ko'])
                 combined_transcript = ' '.join(item['text'] for item in transcript_text)
                 transcripts.append(combined_transcript)
             except:
