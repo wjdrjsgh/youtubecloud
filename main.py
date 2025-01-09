@@ -9,7 +9,10 @@ import uvicorn
 app = FastAPI()
 
 # YouTube Data API 키
-YOUTUBE_API_KEY = "AIzaSyDywyylijdQYwW1tM5MIM15r6McrGqXYyM"
+# YOUTUBE_API_KEY = "AIzaSyDywyylijdQYwW1tM5MIM15r6McrGqXYyM"
+YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")
+if not YOUTUBE_API_KEY:
+    raise RuntimeError("환경 변수 YOUTUBE_API_KEY가 설정되지 않았습니다.")
 
 def get_video_id(encoded_path: str) -> str:
     """유튜브 경로에서 YouTube ID 추출"""
